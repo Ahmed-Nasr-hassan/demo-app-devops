@@ -41,15 +41,6 @@ terraform/
 aws s3api create-bucket --bucket demo-app-terraform-state --region us-east-1
 ```
 
-2. Create DynamoDB table for state locking:
-```bash
-aws dynamodb create-table \
-    --table-name demo-app-terraform-locks \
-    --attribute-definitions AttributeName=LockID,AttributeType=S \
-    --key-schema AttributeName=LockID,KeyType=HASH \
-    --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
-```
-
 ## Usage
 
 1. Initialize Terraform:
@@ -72,9 +63,8 @@ terraform apply
 
 The infrastructure is managed through GitHub Actions workflows that:
 - Run `terraform plan` on pull requests
-- Run `terraform apply` on merges to main branch
+- Run `terraform apply` on merges to main branch # disabled
 - Use remote state in S3
-- Implement state locking with DynamoDB
 
 ## Variables
 
