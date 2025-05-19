@@ -2,7 +2,18 @@
 
 This repository contains a demo application with a complete DevOps setup, including Docker containerization, Kubernetes deployment, and infrastructure as code using Terraform.
 
+## Application Screenshots
+
+### Architecture Overview
 ![Architecture Diagram](images/demo-app-devops.png)
+The architecture diagram above illustrates the complete DevOps setup of our application, including the CI/CD pipeline, containerization, and Kubernetes deployment components.
+
+### Application Access and Output
+![Accessing Application via Ingress](images/accessing-app-using-ingress-lb-dns.png)
+This screenshot demonstrates how to access the application using the NGINX Ingress Controller's LoadBalancer DNS. The application is accessible through a public endpoint, which routes traffic to the appropriate Kubernetes service.
+
+![Application Output](images/output-updated-after-doing-change.png)
+The application output screenshot shows the successful deployment and response from our demo application after making changes. This confirms that our CI/CD pipeline is working correctly, with changes being automatically built, deployed, and verified.
 
 ## Project Structure
 
