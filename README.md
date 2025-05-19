@@ -80,7 +80,7 @@ The pipeline:
    - `AWS_SECRET_ACCESS_KEY`
 
 3. Make changes to the application code in `Microservices/`
-   for Dockerfile and image build and run details check Microservices/README.md
+   for Dockerfile and image build and run details check `Microservices/README.md`
 
 ## Infrastructure
 
@@ -100,5 +100,3 @@ The application is deployed to Kubernetes using:
 - LoadBalancer service
 
 See the `k8s-yaml/README.md` for detailed deployment instructions.
-
-
