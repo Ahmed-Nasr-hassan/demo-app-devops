@@ -2,14 +2,17 @@
 
 This repository contains a demo application with a complete DevOps setup, including Docker containerization, Kubernetes deployment, and infrastructure as code using Terraform.
 
+![Architecture Diagram](images/demo-app-devops.png)
+
 ## Project Structure
 
 ```
 .
 ├── Microservices/          # Application source code
 ├── k8s-yaml/              # Kubernetes manifests
-│   └── deployment.yaml    # Kubernetes deployment configuration
-│   └── service.yaml       # Kubernetes service configuration
+│   ├── argocd/           # ArgoCD configurations
+│   │   └── application.yaml # Demo app ArgoCD application
+│   └── demo-app/         # Application manifests
 ├── terraform/             # Terraform infrastructure code
 │   ├── modules/          # Reusable Terraform modules
 │   │   └── eks/         # EKS cluster module
@@ -17,7 +20,7 @@ This repository contains a demo application with a complete DevOps setup, includ
 │       └── dev/         # Development environment
 └── .github/
     └── workflows/        # GitHub Actions workflows
-        ├── docker-build-push.yml  # Docker build and push workflow
+        ├── ci-docker-build-push.yml  # Docker build and push workflow
         └── terraform.yml         # Terraform workflow
 ```
 
@@ -25,9 +28,8 @@ This repository contains a demo application with a complete DevOps setup, includ
 
 ### Docker Build and Push Pipeline
 
-The Docker build pipeline (`docker-build-push.yml`) is triggered on:
+The Docker build pipeline (`ci-docker-build-push.yml`) is triggered on:
 - Push to main branch
-- Pull requests to main branch
 - Changes in the `Microservices/` directory
 
 The pipeline:
@@ -35,8 +37,8 @@ The pipeline:
 2. Tags it with both `latest` and the commit short hash
 3. Pushes to DockerHub
 4. Updates the Kubernetes deployment file with the new image tag
-5. Commits and pushes the updated deployment file (only on main branch)
-
+### CD: argocd app
+watch changes to k8s-yaml/demo-app and apply if change done.
 ### Terraform Pipeline
 
 The Terraform pipeline (`terraform.yml`) is triggered on:
@@ -67,7 +69,7 @@ The pipeline:
 
 1. Clone the repository:
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/Ahmed-Nasr-hassan/demo-app-devops.git
    cd demo-app-devops
    ```
 
@@ -78,8 +80,7 @@ The pipeline:
    - `AWS_SECRET_ACCESS_KEY`
 
 3. Make changes to the application code in `Microservices/`
-
-4. Create a pull request or push to main branch to trigger the pipelines
+   for Dockerfile and image build and run details check Microservices/README.md
 
 ## Infrastructure
 
@@ -90,3 +91,14 @@ The infrastructure is managed using Terraform and includes:
 - IAM roles and policies
 
 See the `terraform/README.md` for detailed infrastructure documentation.
+
+## Kubernetes Deployment
+
+The application is deployed to Kubernetes using:
+- ArgoCD for GitOps
+- NGINX Ingress Controller
+- LoadBalancer service
+
+See the `k8s-yaml/README.md` for detailed deployment instructions.
+
+
