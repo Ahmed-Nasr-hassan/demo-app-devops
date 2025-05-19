@@ -30,6 +30,7 @@ This workflow handles the building and pushing of Docker images, as well as upda
 **Required Secrets:**
 - `DOCKERHUB_USERNAME`: DockerHub username
 - `DOCKERHUB_TOKEN`: DockerHub access token
+- `GH_PAT`: GitHub Personal Access Token with repo scope
 
 ### Terraform (terraform.yml)
 
