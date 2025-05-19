@@ -38,4 +38,16 @@ jobs:
             ${{ env.DOCKER_IMAGE }}:latest
             ${{ env.DOCKER_IMAGE }}:${{ steps.commit.outputs.short_hash }}
           cache-from: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache
-          cache-to: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache,mode=max 
+          cache-to: type=registry,ref=${{ env.DOCKER_IMAGE }}:buildcache,mode=max
+
+      - name: Update Kubernetes deployment
+        run: |
+          # Update the image tag in the deployment file
+          sed -i "s|image: ${{ env.DOCKER_IMAGE }}:.*|image: ${{ env.DOCKER_IMAGE }}:${{ steps.commit.outputs.short_hash }}|" k8s-yaml/deployment.yaml
+          
+          # Commit and push the changes
+            git config --global user.name 'GitHub Actions'
+            git config --global user.email 'github-actions@github.com'
+            git add k8s-yaml/deployment.yaml
+            git commit -m "Update deployment image to ${{ steps.commit.outputs.short_hash }}"
+            git push

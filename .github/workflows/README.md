@@ -1,56 +1,58 @@
 # GitHub Actions Workflows
 
-This directory contains GitHub Actions workflows for CI/CD automation of our infrastructure and application deployment.
+This directory contains the GitHub Actions workflows for our CI/CD pipeline.
 
-## Workflows
+## Workflows Overview
 
-### 1. CI Pipeline (`ci-docker-build-push.yml`)
+### Docker Build and Push (ci-docker-build-push.yml)
 
-Manages the building and pushing of Docker images to DockerHub.
+This workflow handles the building and pushing of Docker images, as well as updating the Kubernetes deployment configuration.
 
-#### Triggers
-- Push to `main` branch
-- Only when changes are made in the `Microservices/` directory
+**Triggers:**
+- Push to main branch
+- Pull requests to main branch
+- Changes in the `Microservices/` directory
 
-#### Workflow Steps
-1. **Checkout**: Clones the repository
-2. **Docker Setup**: Configures Docker Buildx
-3. **DockerHub Login**: Authenticates with DockerHub
-4. **Build and Push**: Builds and pushes the Docker image
+**Steps:**
+1. **Checkout Code**: Retrieves the latest code from the repository
+2. **Setup Docker Buildx**: Configures Docker Buildx for multi-platform builds
+3. **DockerHub Login**: Authenticates with DockerHub using repository secrets
+4. **Get Commit Hash**: Captures the short commit hash for image tagging
+5. **Build and Push**: 
+   - Builds the Docker image
+   - Tags with both `latest` and commit hash
+   - Pushes to DockerHub
+   - Uses build cache for faster builds
+6. **Update Kubernetes Deployment**:
+   - Updates the image tag in `k8s-yaml/deployment.yaml`
+   - Commits and pushes the updated deployment file (only on main branch)
 
-#### Required Secrets
+**Required Secrets:**
 - `DOCKERHUB_USERNAME`: DockerHub username
 - `DOCKERHUB_TOKEN`: DockerHub access token
 
-### 2. Terraform Infrastructure Management (`terraform.yml`)
+### Terraform (terraform.yml)
 
-Manages the deployment and updates of our AWS infrastructure using Terraform.
+This workflow manages our infrastructure using Terraform.
 
-#### Triggers
-- Push to `main` branch
-- Pull requests to `main` branch
-- Only when changes are made in the `terraform/` directory
+**Triggers:**
+- Push to main branch
+- Pull requests to main branch
+- Changes in the `terraform/` directory
 
-#### Workflow Steps
-1. **Checkout**: Clones the repository
-2. **Setup Terraform**: Installs Terraform 1.5.0
-3. **AWS Credentials**: Configures AWS access using secrets
-4. **Terraform Format**: Checks code formatting
-5. **Terraform Init**: Initializes Terraform
-6. **Terraform Validate**: Validates the configuration
-7. **Terraform Plan**: Creates execution plan (on PRs)
-8. **PR Update**: Posts plan results as PR comment
-9. **Terraform Apply**: Applies changes (on main branch) #commented to avoid unexpected costs
+**Steps:**
+1. **Checkout Code**: Retrieves the latest code
+2. **Setup Terraform**: Configures Terraform with specified version
+3. **AWS Credentials**: Configures AWS credentials
+4. **Format**: Checks Terraform code formatting
+5. **Init**: Initializes Terraform working directory
+6. **Validate**: Validates Terraform configuration
+7. **Plan**: Creates execution plan (on pull requests)
+8. **Apply**: Applies changes (on main branch)
 
-#### Required Secrets
+**Required Secrets:**
 - `AWS_ACCESS_KEY_ID`: AWS access key
 - `AWS_SECRET_ACCESS_KEY`: AWS secret key
-- `GITHUB_TOKEN`: Automatically provided by GitHub
-
-#### Environment Variables
-- `TF_WORKSPACE`: Set to "dev"
-- `TF_VAR_environment`: Set to "dev"
-
 
 
 
