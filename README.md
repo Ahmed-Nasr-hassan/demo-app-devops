@@ -37,6 +37,9 @@ The application output screenshot shows the successful deployment and response f
 
 ## CI/CD Pipeline
 
+
+For detailed information about our CI/CD pipelines and workflows, see [.github/workflows/README.md](.github/workflows/README.md)
+
 ### Docker Build and Push Pipeline
 
 The Docker build pipeline (`ci-docker-build-push.yml`) is triggered on:
@@ -91,7 +94,7 @@ The pipeline:
    - `AWS_SECRET_ACCESS_KEY`
 
 3. Make changes to the application code in `Microservices/`
-   for Dockerfile and image build and run details check `Microservices/README.md`
+   for Dockerfile and image build and run details check [Microservices/README.md](Microservices/README.md)
 
 ## Infrastructure
 
@@ -101,7 +104,7 @@ The infrastructure is managed using Terraform and includes:
 - Node groups for worker nodes
 - IAM roles and policies
 
-See the `terraform/README.md` for detailed infrastructure documentation.
+See the [terraform/README.md](terraform/README.md) for detailed infrastructure documentation.
 
 ## Kubernetes Deployment
 
@@ -110,4 +113,4 @@ The application is deployed to Kubernetes using:
 - NGINX Ingress Controller
 - LoadBalancer service
 
-See the `k8s-yaml/README.md` for detailed deployment instructions.
+See the [k8s-yaml/README.md](k8s-yaml/README.md) for detailed deployment instructions.
