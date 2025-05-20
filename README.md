@@ -1,6 +1,6 @@
 # Demo App DevOps
 
-This repository contains a demo application with a complete DevOps setup, including Docker containerization, Kubernetes deployment, and infrastructure as code using Terraform.
+This repository contains a demo application with a complete DevOps setup, including Docker containerization, Kubernetes deployment, and infrastructure as code using Terraform for both AWS and Azure cloud providers.
 
 ## Application Screenshots
 
@@ -23,12 +23,23 @@ The application output screenshot shows the successful deployment and response f
 ├── k8s-yaml/              # Kubernetes manifests
 │   ├── argocd/           # ArgoCD configurations
 │   │   └── application.yaml # Demo app ArgoCD application
-│   └── demo-app/         # Application manifests
+│   ├── demo-app/         # Application manifests
+│   │   ├── deployment.yaml # Application deployment
+│   │   ├── service.yaml    # LoadBalancer service
+│   │   └── ingress.yaml    # NGINX ingress configuration
+│   └── ingress-nginx/    # NGINX Ingress Controller manifests
+│       └── azure-ingress-nginx.yaml
 ├── terraform/             # Terraform infrastructure code
-│   ├── modules/          # Reusable Terraform modules
-│   │   └── eks/         # EKS cluster module
-│   └── environments/     # Environment-specific configurations
-│       └── dev/         # Development environment
+│   ├── aws/              # AWS infrastructure
+│   │   ├── modules/      # Reusable Terraform modules
+│   │   │   └── eks/     # EKS cluster module
+│   │   └── environments/ # Environment-specific configurations
+│   │       └── dev/     # Development environment
+│   └── azure/            # Azure infrastructure
+│       ├── modules/      # Reusable Terraform modules
+│       │   └── aks/     # AKS cluster module
+│       └── environments/ # Environment-specific configurations
+│           └── dev/     # Development environment
 └── .github/
     └── workflows/        # GitHub Actions workflows
         ├── ci-docker-build-push.yml  # Docker build and push workflow
@@ -36,7 +47,6 @@ The application output screenshot shows the successful deployment and response f
 ```
 
 ## CI/CD Pipeline
-
 
 For detailed information about our CI/CD pipelines and workflows, see [.github/workflows/README.md](.github/workflows/README.md)
 
@@ -51,8 +61,10 @@ The pipeline:
 2. Tags it with both `latest` and the commit short hash
 3. Pushes to DockerHub
 4. Updates the Kubernetes deployment file with the new image tag
-### CD: argocd app
-watch changes to k8s-yaml/demo-app and apply if change done.
+
+### CD: ArgoCD Application
+Watch changes to k8s-yaml/demo-app and apply if change done.
+
 ### Terraform Pipeline
 
 The Terraform pipeline (`terraform.yml`) is triggered on:
@@ -64,6 +76,7 @@ The pipeline:
 1. Formats and validates Terraform code
 2. Plans changes on pull requests
 3. Applies changes on main branch pushes
+4. Supports both AWS and Azure deployments
 
 ## Prerequisites
 
@@ -75,7 +88,13 @@ The pipeline:
    - `AWS_ACCESS_KEY_ID` secret
    - `AWS_SECRET_ACCESS_KEY` secret
 
-3. GitHub repository with:
+3. Azure account with:
+   - `ARM_SUBSCRIPTION_ID` secret
+   - `ARM_TENANT_ID` secret
+   - `ARM_CLIENT_ID` secret
+   - `ARM_CLIENT_SECRET` secret
+
+4. GitHub repository with:
    - Actions permissions enabled
    - Repository secrets configured
 
@@ -92,6 +111,10 @@ The pipeline:
    - `DOCKERHUB_TOKEN`
    - `AWS_ACCESS_KEY_ID`
    - `AWS_SECRET_ACCESS_KEY`
+   - `ARM_SUBSCRIPTION_ID`
+   - `ARM_TENANT_ID`
+   - `ARM_CLIENT_ID`
+   - `ARM_CLIENT_SECRET`
 
 3. Make changes to the application code in `Microservices/`
    for Dockerfile and image build and run details check [Microservices/README.md](Microservices/README.md)
@@ -99,10 +122,18 @@ The pipeline:
 ## Infrastructure
 
 The infrastructure is managed using Terraform and includes:
+
+### AWS Infrastructure
 - EKS cluster
 - VPC with public and private subnets
 - Node groups for worker nodes
 - IAM roles and policies
+
+### Azure Infrastructure
+- AKS cluster
+- Virtual Network with subnets
+- Node pools
+- Managed identities
 
 See the [terraform/README.md](terraform/README.md) for detailed infrastructure documentation.
 
@@ -114,3 +145,26 @@ The application is deployed to Kubernetes using:
 - LoadBalancer service
 
 See the [k8s-yaml/README.md](k8s-yaml/README.md) for detailed deployment instructions.
+
+## Cloud Provider Specific Notes
+
+### AWS
+- Uses EKS for managed Kubernetes
+- ELB for load balancing
+- IAM for authentication
+- VPC for networking
+
+### Azure
+- Uses AKS for managed Kubernetes
+- Azure Load Balancer
+- Managed Identities
+- Virtual Network
+
+## Additional Resources
+
+- [Docker Documentation](https://docs.docker.com/)
+- [Kubernetes Documentation](https://kubernetes.io/docs/)
+- [Terraform Documentation](https://www.terraform.io/docs/)
+- [ArgoCD Documentation](https://argo-cd.readthedocs.io/)
+- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
+- [Azure AKS Documentation](https://docs.microsoft.com/azure/aks/)

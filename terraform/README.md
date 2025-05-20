@@ -1,91 +1,174 @@
-# Terraform EKS Infrastructure
+# Terraform Infrastructure
 
-This directory contains Terraform configurations for deploying and managing an EKS cluster infrastructure on AWS.
+This directory contains Terraform configurations for both AWS and Azure cloud providers.
 
 ## Directory Structure
 
 ```
 terraform/
-├── modules/
-│   └── eks/                    # EKS module
-│       ├── main.tf            # Main EKS and VPC configuration
-│       ├── variables.tf       # Module variables
-│       └── outputs.tf         # Module outputs
-├── environments/
-│   └── dev/                   # Development environment
-│       ├── main.tf           # Environment-specific configuration
-│       └── terraform.tfvars  # Environment variables
-├── providers.tf              # Provider configurations
-└── variables.tf             # Global variables
+├── aws/                # AWS infrastructure
+│   ├── environments/   # Environment-specific configurations
+│   │   └── dev/       # Development environment
+│   └── modules/       # Reusable Terraform modules
+│       └── eks/       # EKS cluster module
+└── azure/             # Azure infrastructure
+    ├── environments/  # Environment-specific configurations
+    │   └── dev/      # Development environment
+    └── modules/      # Reusable Terraform modules
+        └── aks/      # AKS cluster module
 ```
-
-## Infrastructure Components
-
-- **VPC**: Custom VPC with public and private subnets across 3 AZs
-- **EKS Cluster**: Managed Kubernetes cluster
-- **Node Groups**: Managed node groups with auto-scaling capabilities
-- **Networking**: NAT Gateway for private subnet internet access
-- **Security**: Proper security groups and IAM roles
 
 ## Prerequisites
 
+### AWS
 1. AWS CLI configured with appropriate credentials
-2. Terraform >= 1.0.0
-3. S3 bucket for Terraform state
-4. DynamoDB table for state locking
+2. Required environment variables:
+   - `AWS_ACCESS_KEY_ID`
+   - `AWS_SECRET_ACCESS_KEY`
 
-## Setup
+### Azure
+1. Azure CLI installed and configured
+2. Required environment variables:
+   - `ARM_SUBSCRIPTION_ID`
+   - `ARM_TENANT_ID`
+   - `ARM_CLIENT_ID`
+   - `ARM_CLIENT_SECRET`
 
-1. Create S3 bucket for state:
-```bash
-aws s3api create-bucket --bucket demo-app-terraform-state --region us-east-1
+## Quick Start
+
+### AWS Infrastructure
+
+1. Navigate to the AWS environment:
+   ```bash
+   cd aws/environments/dev
+   ```
+
+2. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+
+3. Plan the changes:
+   ```bash
+   terraform plan
+   ```
+
+4. Apply the changes:
+   ```bash
+   terraform apply
+   ```
+
+### Azure Infrastructure
+
+1. Navigate to the Azure environment:
+   ```bash
+   cd azure/environments/dev
+   ```
+
+2. Initialize Terraform:
+   ```bash
+   terraform init
+   ```
+
+3. Plan the changes:
+   ```bash
+   terraform plan
+   ```
+
+4. Apply the changes:
+   ```bash
+   terraform apply
+   ```
+
+## Infrastructure Components
+
+### AWS Components
+- EKS Cluster
+- VPC with public and private subnets
+- Node groups for worker nodes
+- IAM roles and policies
+- Security groups
+
+### Azure Components
+- AKS Cluster
+- Virtual Network with subnets
+- Node pools
+- Managed identities
+- Network security groups
+
+## Module Usage
+
+### AWS EKS Module
+```hcl
+module "eks" {
+  source = "../../modules/eks"
+
+  cluster_name    = var.cluster_name
+  cluster_version = var.cluster_version
+  vpc_id         = var.vpc_id
+  subnet_ids     = var.subnet_ids
+  node_groups    = var.node_groups
+}
 ```
 
-## Usage
+### Azure AKS Module
+```hcl
+module "aks" {
+  source = "../../modules/aks"
 
-1. Initialize Terraform:
-```bash
-cd environments/dev
-terraform init
+  cluster_name        = var.cluster_name
+  location           = var.location
+  resource_group_name = var.resource_group_name
+  node_count         = var.node_count
+  vm_size            = var.vm_size
+}
 ```
 
-2. Plan the changes:
-```bash
-terraform plan
-```
+## Environment Variables
 
-3. Apply the changes:
-```bash
-terraform apply
-```
-
-## CI/CD Pipeline
-
-The infrastructure is managed through GitHub Actions workflows that:
-- Run `terraform plan` on pull requests
-- Run `terraform apply` on merges to main branch # disabled
-- Use remote state in S3
-
-## Variables
-
-Key variables can be configured in `environments/dev/terraform.tfvars`:
-- `aws_region`: AWS region for deployment
-- `environment`: Environment name (dev, staging, prod)
-- `cluster_name`: EKS cluster name
+### AWS Variables
+- `cluster_name`: Name of the EKS cluster
 - `cluster_version`: Kubernetes version
-- `node_groups`: Node group configurations
+- `region`: AWS region
+- `vpc_cidr`: VPC CIDR block
+- `node_groups`: Worker node configurations
 
-## Security
+### Azure Variables
+- `cluster_name`: Name of the AKS cluster
+- `location`: Azure region
+- `resource_group_name`: Name of the resource group
+- `node_count`: Number of nodes in the default node pool
+- `vm_size`: Size of the VM for the node pool
 
-- State file is encrypted in S3
-- State locking prevents concurrent modifications
-- Private subnets for worker nodes
-- Public subnets only for load balancers
-- Proper IAM roles and policies
+## Security Considerations
 
-## Maintenance
+### AWS
+- Use IAM roles for service accounts (IRSA)
+- Implement network policies
+- Use private subnets for worker nodes
+- Enable encryption at rest
 
-- Regular updates of Terraform modules
-- Monitoring of node group scaling
-- Regular security group reviews
-- Cost optimization through node group configurations 
+### Azure
+- Use managed identities
+- Implement network policies
+- Use private subnets for worker nodes
+- Enable encryption at rest
+
+## Cost Optimization
+
+### AWS
+- Use spot instances for non-critical workloads
+- Implement auto-scaling
+- Use reserved instances for production workloads
+
+### Azure
+- Use spot instances for non-critical workloads
+- Implement auto-scaling
+- Use reserved instances for production workloads
+
+## Additional Resources
+
+- [AWS EKS Documentation](https://docs.aws.amazon.com/eks/)
+- [Azure AKS Documentation](https://docs.microsoft.com/azure/aks/)
+- [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)
+- [Terraform Azure Provider](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs)
